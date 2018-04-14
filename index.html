@@ -5,19 +5,64 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
-<body>
-
+<body style="margin-bottom: 100px">
 <div class="container">
-    <h3>Part 1</h3>
-    <video width="400" controls>
-        <source src="https://youtu.be/XtuCX-A9HXE" type="video/mp4">
+    <h2>Part 1</h2>
+    <h4>Video</h4>
+    <video width="400" controls="controls">
+        <source src="EXO Intro Dubstep.mp4" type="video/mp4">
         Your browser does not support HTML5 video.
     </video>
+    <br>
+    <br>
 
+    <h4>Audio</h4>
+    <audio controls>
+        <source src="Careless Whisper (YeahRight! Remix).mp3" type="audio/mp3">
+        Your browser does not support the audio tag.
+    </audio>
+    <br>
+    <br>
+
+    <h4>Canvas</h4>
+    <b>(source: https://www.w3schools.com/html/html5_canvas.asp)</b>
+    <canvas id="myCanvas" width="640" height="100" style=""></canvas>
+    <br>
+    <br>
+
+    <h4>Required Field</h4>
+    <b>(Click submit to see if it's required)</b>
+    <form>
+        What is your favorite song? (required): <br>
+        <input type="text" name="name" required>
+        <input type="submit">
+    </form>
+    <br>
+    <br>
+
+    <h4>Editable Content</h4>
+    <p contenteditable="true">This is an editable paragraph.</p>
+    <br>
+    <br>
 </div>
 
+
+<hr>
 <div class="container">
-    <h3>Part 2</h3>
+    <h2>Part 2</h2>
+    <h4>Worker</h4>
+    <div id="workerTime"></div>
+    <br>
+    <br>
+
+    <h4>Local Form</h4>
+    <form id="localForm" onsubmit="return false;">
+        Name (required): <input type="text" name="name" required><br>
+        Address: <input type="text" name="address"><br>
+        Phone: <input type="text" name="phoneNumber"><br>
+        Blood Type: <input type="text" name="bloodType"><br>
+        <button type="submit">Save</button>
+    </form>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -29,5 +74,46 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
+<script src="moment.js"></script>
+<script>
+    // Canvas
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    ctx.beginPath();
+    ctx.arc(95, 50, 40, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // Web Worker
+    var worker = new Worker('doWork.js');
+    worker.addEventListener('message', function (e) {
+        $('#workerTime').text(e.data)
+    }, false);
+    setInterval(function updateTime() {
+        var date = moment();
+        worker.postMessage(date.format('MMMM Do YYYY, h:mm:ss a'));
+    }, 1000);
+
+    // Local Form
+    if (localStorage.getItem('localForm')) {
+        try {
+            // prefill
+            var localFormData = JSON.parse(localStorage.getItem('localForm'));
+            for (var i in localFormData) {
+                $('#localForm input[name="' + localFormData[i].name + '"]')
+                    .val(localFormData[i].value);
+            }
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+    $('#localForm').submit(function (event) {
+        console.log($(this).serializeArray());
+        var formData = $(this).serializeArray();
+        localStorage.setItem('localForm', JSON.stringify(formData));
+        event.preventDefault();
+    });
+
+</script>
 </body>
 </html>
